@@ -1,11 +1,17 @@
-# Download used modules
-terraform {
-  source  = "git::git@github.com:SergioFernandezCordero/terraform-modules.git//modules/infra?ref=main"
-}
-
-# Generate tfstate in S3
+# Generate root config, like URLs and TFSTATE in S3
 include "root" {
   path  = find_in_parent_folders("root.hcl")
+}
+
+# Load environment variables
+include "env" {
+  path    = "${get_terragrunt_dir()}/../../_env/infra.hcl"
+  expose  = true
+}
+
+# Download used modules
+terraform {
+  source  = "${include.env.locals.source_base_url}infra/?ref=main"
 }
 
 # Variables to run the modules
